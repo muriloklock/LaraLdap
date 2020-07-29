@@ -20,3 +20,5 @@ $ composer require laravel/ui
 $ php artisan ui bootstrap --auth
 $ npm install && npm run dev
 ```
+# Etapa 4 - Ajustar dados ndo banco de dados no arquivo .env
+Ajustar no arquivo .env os dados de conexão ao banco de dados
