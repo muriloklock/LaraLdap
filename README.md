@@ -22,3 +22,9 @@ $ npm install && npm run dev
 ```
 # Etapa 4 - Ajustar dados ndo banco de dados no arquivo .env
 Ajustar no arquivo .env os dados de conexão ao banco de dados
+
+# Etapa 5 - Adequar tabela de usuários
+Ajusta o arquivo migrate da tabela de usuarios.
+```bash=
+php artisan migrate
+```
