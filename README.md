@@ -28,3 +28,12 @@ Ajusta o arquivo migrate da tabela de usuarios.
 ```bash=
 php artisan migrate
 ```
+
+# Etapa 6 - Adequar o controller de login 
+Alterar o arquivo app/Http/Controllers/Auth/LoginController.php para usar o campo username.
+```php=
+    public function username()
+    {
+        return 'username';
+    }
+```
