@@ -55,3 +55,6 @@ Alterar o arquivo /var/www/teste/resources/views/auth/login.blade.php para usar 
         </div>
     </div>
 ```
+
+# Etapa 8 - Validar credenciais no LDAP
+Alterar a validação do banco de dados para o LDAP, alterar o método validateCredentials de ./vendor/laravel/framework/src/Illuminate/Auth/EloquentUserProvider.php
