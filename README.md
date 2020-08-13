@@ -58,7 +58,7 @@ Alterar o arquivo /var/www/teste/resources/views/auth/login.blade.php para usar 
 
 # Etapa 8 - Validar credenciais no LDAP
 Alterar a validação de usuários (username e passowrd) do banco de dados para o LDAP.
-Para isso vamos extender o método validateCredentials padrão do Laravel(EloquentUser_.
+Para isso vamos extender o método validateCredentials padrão do Laravel(EloquentUser).
 Crie o arquivo OiUserProvider.php em app/Providers/ e dentro dele coloque o método com sua modificação. No meu caso, fiz a validação via LDAP.
 ```php=
 <?php
