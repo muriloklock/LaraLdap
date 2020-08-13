@@ -57,7 +57,75 @@ Alterar o arquivo /var/www/teste/resources/views/auth/login.blade.php para usar 
 ```
 
 # Etapa 8 - Validar credenciais no LDAP
-Alterar a validação do banco de dados para o LDAP, alterar o método validateCredentials de ./vendor/laravel/framework/src/Illuminate/Auth/EloquentUserProvider.php
+Alterar a validação de usuários (username e passowrd) do banco de dados para o LDAP.
+Para isso vamos extender o método validateCredentials padrão do Laravel(EloquentUser_.
+Crie o arquivo OiUserProvider.php em app/Providers/ e dentro dele coloque o método com sua modificação. No meu caso, fiz a validação via LDAP.
+```php=
+<?php
+namespace App\Providers;
+
+use Illuminate\Auth\EloquentUserProvider as UserProvider;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+
+
+class OiUserProvider extends UserProvider {
+
+    /**
+     * Overrides the framework defaults validate credentials method 
+     *
+     * @param UserContract $user
+     * @param array $credentials
+     * @return bool
+     */
+    public function validateCredentials(UserContract $user, array $credentials) {
+        $plain = $credentials['password'];
+
+        if ($ldapconn = @ldap_connect(env('LDAP_SERVER', false)) ) {
+            @ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
+            @ldap_set_option($ldapconn, LDAP_OPT_DEREF, 3);
+            if (@ldap_start_tls($ldapconn)) {
+                $ldaprdn = "OI\\" . $credentials['username'];
+                if ($ldapbind = @ldap_bind($ldapconn, $ldaprdn, $plain) ) {
+                    $filter = "cn=" . $credentials['username'];
+                    if ($res = @ldap_search($ldapconn, env('LDAP_BASEDN', false), $filter)) {
+                        $entries = @ldap_get_entries($ldapconn, $res);
+                        if ($entries['count']>0) {
+                            return true;
+                        }
+                    }
+                    @ldap_unbind($ldapconn);
+                }
+            }
+        }
+        return false;
+    }
+
+}
+```
+
+Depois de feita a modificação acima, o Laravel tem que saber como chamar o novo provider.
+Vamos fazr isto extendento do método boot() no arquivo app/Providers/AuthServiceProvider.php.
+```php=
+public function boot()
+    {
+        $this->registerPolicies();
+
+        \Illuminate\Support\Facades\Auth::provider('oiuserprovider', function($app, array $config) {
+		    return new OiUserProvider($app['hash'], $config['model']);
+	    });
+    }
+```
+
+E finalmente vamos alterar as configurações do Laravel para usar o novo user provider.
+Edite o arquivo config/auth.php em 'providers' -> 'users'.
+```php=
+    'providers' => [
+        'users' => [
+            //'driver' => 'eloquent',
+            'driver' => 'oiuserprovider',
+            'model' => App\User::class,
+        ],
+```
 
 # Etapa 9 - Adequar formulário de Registro.
 Alterar o formulário de registro de usuário.
